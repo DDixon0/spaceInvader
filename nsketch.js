@@ -22,17 +22,19 @@ class Enemy{
         this.hp = hp;
         this.hpbar = hp;
         this.bspd = 0.1;
-        //this.img = img; this is for the future
+        this.img = img;
         this.bullets = [];
         this.false = true;
     }
 
     display(){
+        imageMode(CENTER);
         rectMode(CENTER);
-        fill(this.color);
-
-        //image(this.img, this.x, this.y); this is for the future
+        fill('black');
+        
+        
         rect(this.x, this.y, this.width, this.height);
+        image(this.img, this.x, this.y); 
 
         //health Bar
         if (this.hp != this.hpbar){
@@ -200,14 +202,14 @@ let enemies = [];
 let explosions = [];
 let enemyAmount = 10;
 let W, H;
-let spaceExplo, spaceBlip, spaceHurt, spaceLaser;
+let spaceExplo, spaceBlip, spaceHurt, spaceLaser, spaceEnemy;
 
 function preload() {
     spaceExplo = loadSound('spaceExplo.ogg');
     spaceBlip = loadSound('spaceBlip.ogg');
     spaceHurt = loadSound('spaceHurt.ogg');
     spaceLaser = loadSound('spaceLaser.ogg');
-    spaceBit = loadSound('spaceBit.mp3');
+    spaceEnemy = loadImage('spaceEnemyImg.png');
 
 
 }
@@ -218,11 +220,15 @@ function setup(){
     W = width;
     H = height;
 
+    //Resize image
+    spaceEnemy.resize((W * 1/20), (H * 1/20)); 
+
 
     //array for enemies
     for (let i = 0; i < enemyAmount; i++){
-    
-      enemies.push(new Enemy(W * ((i+1)/(enemyAmount+2)) , 1/10 * H, W * 1/(enemyAmount * 2), H * 1/(enemyAmount * 2), 	'#00bfff', 3, null));
+
+        
+      enemies.push(new Enemy(W * ((i+1)/(enemyAmount+2)) , 1/10 * H, W * 1/(enemyAmount * 2), H * 1/(enemyAmount * 2), 	'#00bfff', 3, spaceEnemy));
       //The x makes all the mobs centered ish
       //The y is 1/10 the height
       //The width is the inverseof the amount of enemies * 2 then times width
@@ -232,9 +238,8 @@ function setup(){
 
 //All the stuff for the 
 player = new Player((W * 1/2), (H * 9/10), (W * 1/20), (H * 1/20), 15, 50, 1, '#fae', null);
+
   
-spaceBit.play();
-spaceBit.loop();
 }
 
 function draw(){
@@ -314,7 +319,7 @@ function draw(){
      //Creates more Enemies
      if (enemies.length <= 0){
     for (let i = 0; i < enemyAmount; i++){
-        enemies.push(new Enemy(W * ((i+1)/(enemyAmount+2)) , 1/10 * H, W * 1/(enemyAmount * 2), H * 1/(enemyAmount * 2), 	'#00bfff', 3, null));
+        enemies.push(new Enemy(W * ((i+1)/(enemyAmount+2)) , 1/10 * H, W * 1/(enemyAmount * 2), H * 1/(enemyAmount * 2), 	'#00bfff', 3, spaceEnemy));
     }
     }
 
