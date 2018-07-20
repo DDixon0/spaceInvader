@@ -14,14 +14,17 @@ a space invaders like game.
 class Enemy{
     constructor(x, y, width, height, color, hp, img){
         this.x = x;
+        this.sx = this.x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.color = color;
         this.hp = hp;
         this.hpbar = hp;
+        this.bspd = 0.1;
         //this.img = img; this is for the future
         this.bullets = [];
+        this.false = true;
     }
 
     display(){
@@ -42,16 +45,36 @@ class Enemy{
 
     movement(){
         //this will make it move
+        this.x +=this.bspd;
+        
+        
+        if (this.sx + (W * 1/enemyAmount+1) <= this.x){
+            this.y += 5;
+            this.sx = this.x;
+            this.bspd = -(this.bspd + 0.1);
+
+
+        }
+
+        if (this.sx - (W * 1/enemyAmount+1) >= this.x){
+            this.y += 5;
+            this.sx = this.x;
+            this.bspd = -(this.bspd - 0.1);
+
+        }
+
     }
 
     die(j){
 
         this.hp--;
+        spaceHurt.play();
 
         if(this.hp === 0){
         player.score+=5;
         explosions.push(new Exploion(this.x,this.y,this.color));
         enemies.splice(j,1); 
+        spaceExplo.play();
         }
     }
 
@@ -85,6 +108,13 @@ class Bullet{
         //adds 1 to score and removes bullet
         player.score+=1;
         player.bullets.splice(i,1);
+    }
+
+    attack(i,j){
+        explosions.push(new Exploion(this.x,this.y,this.color));
+        enemies[j].bullets.splice(i,1);
+        player.hp--;
+        player.score--;
     }
 
 
@@ -138,6 +168,7 @@ class Player {
         this.movement();
     }
 
+   
 
 
 }
@@ -169,6 +200,17 @@ let enemies = [];
 let explosions = [];
 let enemyAmount = 10;
 let W, H;
+let spaceExplo, spaceBlip, spaceHurt, spaceLaser;
+
+function preload() {
+    spaceExplo = loadSound('spaceExplo.ogg');
+    spaceBlip = loadSound('spaceBlip.ogg');
+    spaceHurt = loadSound('spaceHurt.ogg');
+    spaceLaser = loadSound('spaceLaser.ogg');
+    spaceBit = loadSound('spaceBit.mp3');
+
+
+}
 
 function setup(){
     createCanvas(windowWidth,windowHeight);
@@ -191,23 +233,44 @@ function setup(){
 //All the stuff for the 
 player = new Player((W * 1/2), (H * 9/10), (W * 1/20), (H * 1/20), 15, 50, 1, '#fae', null);
   
-
+spaceBit.play();
+spaceBit.loop();
 }
 
 function draw(){
     background(0,0,0);
 
-    //displays the enemies and stuff
+    //displays the enemies and enemy bullets
     for (const enemy of enemies){
         enemy.display();
+        enemy.movement();
 
         for (const bullet of enemy.bullets){
             bullet.movement();
             bullet.display();
 
-            //gonna put collision in here
+            //remove unneccesary enemy bullets
+             if (enemy.bullets[0].y >= height ){
+                enemy.bullets.splice(0,1);
 
+            } 
+        
+            //collision for enemy bullets and player here
+            if(bullet.y <= player.y + (player.height/2 + bullet.radius) && 
+                bullet.y >= player.y - (player.height/2 + bullet.radius) &&
+                bullet.x <= player.x + (player.width/2 + bullet.radius) &&
+                bullet.x >= player.x - (player.width/2 + bullet.radius)
+            ){
+                let i = enemy.bullets.indexOf(bullet);
+                let j = enemies.indexOf(enemy);
+
+                //do something here
+                bullet.attack(i, j);
+                spaceBlip.play();
             }
+
+
+        }
         
     }
 
@@ -243,16 +306,21 @@ function draw(){
         }
      }
 
-     //Exploding collision
+     //Exploding 
      for (const boom of explosions){
          boom.explode();
      }
+    
+     //Creates more Enemies
+     if (enemies.length <= 0){
+    for (let i = 0; i < enemyAmount; i++){
+        enemies.push(new Enemy(W * ((i+1)/(enemyAmount+2)) , 1/10 * H, W * 1/(enemyAmount * 2), H * 1/(enemyAmount * 2), 	'#00bfff', 3, null));
+    }
+    }
 
-    //The enemies shooting
+    //The enemies shooting 60fps so 1 per second
     if (frameCount % 60 == 0){
         let i = Math.floor(random(enemies.length));
-        console.log(i);
-        
         enemies[i].bullets.push(new Bullet(enemies[i].x, enemies[i].y, W/240, -7, 'white'));
 
     }
@@ -260,10 +328,21 @@ function draw(){
  
     //Display score
     text("Score: " + player.score, W * 11/12, H * 1/10);
+
+    //Green
+    fill(0, 255, 0);
+    //Display Hp
+    text("Health: " + player.hp, W * 11/12, H * 1/15);
 }
 
 function keyPressed() {
     if (keyCode === 32) {
       player.bullets.push(new Bullet(player.x, player.y, W/240, 7, 'yellow'));
+      spaceLaser.play();
     }
   }
+
+function mousePressed(){
+
+
+}
