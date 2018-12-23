@@ -205,11 +205,11 @@ let W, H;
 let spaceExplo, spaceBlip, spaceHurt, spaceLaser, spaceEnemy;
 
 function preload() {
-    spaceExplo = loadSound('spaceExplo.ogg');
-    spaceBlip = loadSound('spaceBlip.ogg');
-    spaceHurt = loadSound('spaceHurt.ogg');
-    spaceLaser = loadSound('spaceLaser.ogg');
-    spaceEnemy = loadImage('spaceEnemyImg.png');
+    spaceExplo = loadSound('Sounds/spaceExplo.ogg');
+    spaceBlip = loadSound('Sounds/spaceBlip.ogg');
+    spaceHurt = loadSound('Sounds/spaceHurt.ogg');
+    spaceLaser = loadSound('Sounds/spaceLaser.ogg');
+    spaceEnemy = loadImage('Images/spaceEnemyImg.png');
 
 
 }
